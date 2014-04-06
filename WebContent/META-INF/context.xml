@@ -2,7 +2,7 @@
 <!DOCTYPE PaymentSystem>
 <Context path="/LetsPlay" aliases="/file=D:\FILESYSTEM">
 	<Resource name="jdbc/lets_play" auth="Container" type="javax.sql.DataSource"
-		maxActive="100" maxIdle="30" maxWait="10000" username="root"
-		password="q3dm17" driverClassName="com.mysql.jdbc.Driver"
+		maxActive="100" maxIdle="30" maxWait="10000" username=""
+		password="" driverClassName="com.mysql.jdbc.Driver"
 		url="jdbc:mysql://localhost/lets_play" />
 </Context>

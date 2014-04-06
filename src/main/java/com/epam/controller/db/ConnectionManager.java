@@ -29,12 +29,6 @@ public class ConnectionManager {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		/*
-		 * try { connection = DriverManager.getConnection(
-		 * "jdbc:mysql://localhost/lets_play", "root", "q3dm17"); } catch
-		 * (SQLException e) { e.printStackTrace(); throw new RuntimeException();
-		 * }
-		 */
 
 		try {
 			InitialContext initContext = new InitialContext();
