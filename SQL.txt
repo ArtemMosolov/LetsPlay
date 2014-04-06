@@ -1,0 +1,166 @@
+
+CREATE DATABASE `lets_play_play` CHARACTER SET utf8 COLLATE utf8_general_ci;
+use `lets_play_play`;
+set names utf8;
+CREATE TABLE `user` (
+  `id_user` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(128) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `language` varchar(128) NOT NULL,
+  `is_admin` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id_user`),
+  UNIQUE KEY `login` (`login`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `image` (
+  `id_image` int(11) NOT NULL AUTO_INCREMENT,
+  `file_name` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_image`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `artists` (
+  `id_artists` int(11) NOT NULL AUTO_INCREMENT,
+  `name_artists` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_artists`),
+  UNIQUE KEY `name_artists` (`name_artists`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `album` (
+  `id_album` int(11) NOT NULL AUTO_INCREMENT,
+  `name_album` varchar(128) NOT NULL,
+  `id_artists` int(11) NOT NULL,
+  PRIMARY KEY (`id_album`),
+  KEY `album_to_artists` (`id_artists`),
+  CONSTRAINT `album_to_artists` FOREIGN KEY (`id_artists`) REFERENCES `artists` (`id_artists`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `album_description` (
+  `id_album` int(11) NOT NULL,
+  `title_album` varchar(128) DEFAULT NULL,
+  `description_album` text,
+  `id_image` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_album`),
+  KEY `image_to_description` (`id_image`),
+  CONSTRAINT `album_to_description` FOREIGN KEY (`id_album`) REFERENCES `album` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `image_to_description` FOREIGN KEY (`id_image`) REFERENCES `image` (`id_image`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `song` (
+  `id_song` int(11) NOT NULL AUTO_INCREMENT,
+  `name_song` varchar(128) NOT NULL,
+  `id_album` int(11) NOT NULL,
+  `file_song` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_song`),
+  UNIQUE KEY `name_song_UNIQUE` (`name_song`),
+  KEY `song_to_album` (`id_album`),
+  CONSTRAINT `song_to_album` FOREIGN KEY (`id_album`) REFERENCES `album` (`id_album`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_play_list` (
+  `id_user_play_list` int(11) NOT NULL AUTO_INCREMENT,
+  `name_play_list` varchar(128) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  PRIMARY KEY (`id_user_play_list`),
+  KEY `list_to_user` (`id_user`),
+  CONSTRAINT `list_to_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `playlist` (
+  `id_user_play_list` int(11) NOT NULL,
+  `id_song` int(11) NOT NULL,
+  PRIMARY KEY (`id_user_play_list`,`id_song`),
+  KEY `song_to_composit` (`id_song`),
+  CONSTRAINT `list_to_composit` FOREIGN KEY (`id_user_play_list`) REFERENCES `user_play_list` (`id_user_play_list`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `song_to_composit` FOREIGN KEY (`id_song`) REFERENCES `song` (`id_song`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `genre` (
+  `id_genre` int(11) NOT NULL AUTO_INCREMENT,
+  `name_genre` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_genre`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `genre_song` (
+  `id_song` int(11) NOT NULL,
+  `id_genre` int(11) NOT NULL,
+  PRIMARY KEY (`id_song`,`id_genre`),
+  KEY `from genre` (`id_genre`),
+  CONSTRAINT `from genre` FOREIGN KEY (`id_genre`) REFERENCES `genre` (`id_genre`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `from song` FOREIGN KEY (`id_song`) REFERENCES `song` (`id_song`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `artists_description` (
+  `id_artists` int(11) NOT NULL,
+  `title` varchar(128) DEFAULT NULL,
+  `artists_description` text,
+  `id_image` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_artists`),
+  KEY `description_to_image` (`id_image`),
+  CONSTRAINT `description_to_artists` FOREIGN KEY (`id_artists`) REFERENCES `artists` (`id_artists`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `description_to_image` FOREIGN KEY (`id_image`) REFERENCES `image` (`id_image`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_restore` (
+  `id_user_restore` int(11) NOT NULL AUTO_INCREMENT,
+  `hash` varchar(128) NOT NULL,
+  `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_user` int(11) NOT NULL,
+  PRIMARY KEY (`id_user_restore`),
+  KEY `user_to_restore` (`id_user`),
+  CONSTRAINT `user_to_restore` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `delete_file` (
+  `id_delete_file` int(11) NOT NULL AUTO_INCREMENT,
+  `name_file` varchar(128) NOT NULL,
+  PRIMARY KEY (`id_delete_file`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `rating` (
+  `id_user` int(11) NOT NULL,
+  `id_song` int(11) NOT NULL,
+  `like` int(11) DEFAULT NULL,
+  `dislike` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_user`,`id_song`),
+  KEY `song_to_rating` (`id_song`),
+  CONSTRAINT `song_to_rating` FOREIGN KEY (`id_song`) REFERENCES `song` (`id_song`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_to_rating` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `user_info` (
+  `id_user` int(11) NOT NULL,
+  `id_image` int(11) DEFAULT NULL,
+  `first_name` varchar(128) DEFAULT NULL,
+  `last_name` varchar(128) DEFAULT NULL,
+  `gender` varchar(128) DEFAULT NULL,
+  `country` varchar(128) DEFAULT NULL,
+  `city` varchar(128) DEFAULT NULL,
+  `description` text,
+  `date_of_birth` date DEFAULT NULL,
+  PRIMARY KEY (`id_user`),
+  KEY `image_to_info` (`id_image`),
+  CONSTRAINT `image_to_info` FOREIGN KEY (`id_image`) REFERENCES `image` (`id_image`),
+  CONSTRAINT `info_to_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `song_statistic` (
+  `id_user` int(11) NOT NULL,
+  `id_song` int(11) NOT NULL,
+  `count` int(11) NOT NULL,
+  PRIMARY KEY (`id_user`,`id_song`),
+  KEY `song_to_statistic` (`id_song`),
+  CONSTRAINT `song_to_statistic` FOREIGN KEY (`id_song`) REFERENCES `song` (`id_song`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_to_statistic` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
